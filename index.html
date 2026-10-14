@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Convite para o cinema</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #ffc8dd; color: #590d22; font-family: Montserrat, Arial, sans-serif; }
+    main { min-height: 100dvh; position: relative; overflow: hidden; text-align: center; padding: 110px 14px 24px; }
+    h1 { font-size: clamp(22px, 5vw, 32px); margin: 0 0 26px; }
+    button { border: 3px ridge #b77e92; border-radius: 3px; padding: 10px 26px; background: #ffb3c1; color: #590d22; font: bold 17px Montserrat, Arial, sans-serif; cursor: pointer; touch-action: manipulation; }
+    #sim { position: absolute; top: 210px; left: calc(50% + 16px); }
+    #nao { position: absolute; top: 210px; left: calc(50% - 107px); }
+    dialog { border: 2px solid #b77e92; border-radius: 12px; background: #fff2f6; color: #590d22; padding: 24px; max-width: min(90vw, 370px); text-align: center; line-height: 1.6; }
+    dialog::backdrop { background: #590d2266; }
+    dialog button { margin-top: 14px; }
+    @media (max-width: 420px) { main { padding-top: 90px; } #sim, #nao { top: 195px; } }
+  </style>
+</head>
+<body>
+  <main id="area">
+    <h1>Quer ir ao cinema comigo?</h1>
+    <button id="nao" type="button">Não</button>
+    <button id="sim" type="button">Sim</button>
+  </main>
+  <dialog id="resposta">
+    <p>Uhull, te vejo amanhã gatinho, sessão das 18H30 no guarapeba!</p>
+    <button type="button" id="fechar">Fechar</button>
+  </dialog>
+  <script>
+    const area = document.querySelector('#area');
+    const nao = document.querySelector('#nao');
+    const sim = document.querySelector('#sim');
+    const resposta = document.querySelector('#resposta');
+    function fugir() {
+      const pad = 12;
+      const limiteX = Math.max(pad, area.clientWidth - nao.offsetWidth - pad);
+      const limiteY = Math.max(pad, area.clientHeight - nao.offsetHeight - pad);
+      const simRect = sim.getBoundingClientRect();
+      const areaRect = area.getBoundingClientRect();
+      let x = pad, y = pad;
+      for (let i = 0; i < 40; i++) {
+        x = pad + Math.random() * (limiteX - pad);
+        y = pad + Math.random() * (limiteY - pad);
+        const overlap = x < simRect.right - areaRect.left + 10 && x + nao.offsetWidth > simRect.left - areaRect.left - 10 && y < simRect.bottom - areaRect.top + 10 && y + nao.offsetHeight > simRect.top - areaRect.top - 10;
+        if (!overlap) break;
+      }
+      nao.style.left = `${x}px`;
+      nao.style.top = `${y}px`;
+    }
+    // Mouse: foge só quando tentam chegar ao botão, não ao mover pela página.
+    nao.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse' || e.pointerType === 'pen') fugir(); });
+    // Toque: foge antes de o toque conseguir acionar o botão.
+    nao.addEventListener('pointerdown', e => { e.preventDefault(); fugir(); });
+    nao.addEventListener('click', e => { e.preventDefault(); fugir(); });
+    sim.addEventListener('click', () => resposta.showModal());
+    document.querySelector('#fechar').addEventListener('click', () => resposta.close());
+  </script>
+</body>
+</html>
